@@ -1,0 +1,54 @@
+{
+  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings.md",
+  "SettingsVersion": 1.2,
+  "SimMode": "Car",
+  "ViewMode": "FlyWithMe",
+  "SubWindows": [
+    {
+      "WindowID": 0,
+      "CameraName": "0",
+      "ImageType": 3,
+      "VehicleName": "Car1",
+      "Visible": true
+    },
+    {
+      "WindowID": 1,
+      "CameraName": "2",
+      "ImageType": 5,
+      "VehicleName": "Car1",
+      "Visible": true
+    },
+    {
+      "WindowID": 2,
+      "CameraName": "1",
+      "ImageType": 0,
+      "VehicleName": "Car1",
+      "Visible": false
+    }
+  ],
+  "Vehicles": {
+    "Car1": {
+      "VehicleType": "PhysXCar",
+      "X": 4,
+      "Y": 0,
+      "Z": -2,
+      "Sensors": {
+        "Gps": {
+          "SensorType": 3,
+          "Enabled": true,
+          "EphTimeConstant": 0.9,
+          "EpvTimeConstant": 0.9,
+          "EphInitial": 25,
+          "EpvInitial": 25,
+          "EphFinal": 0.1,
+          "EpvFinal": 0.1,
+          "EphMin3d": 3,
+          "EphMin2d": 4,
+          "UpdateLatency": 0.2,
+          "UpdateFrequency": 50,
+          "StartupDelay": 1
+        }
+      }
+    }
+  }
+}
