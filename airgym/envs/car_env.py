@@ -38,7 +38,7 @@ class AirSimCarEnv(AirSimEnv):
         self.car.reset()
         self.car.enableApiControl(True)
         self.car.armDisarm(True)
-        time.sleep(0.05)
+        time.sleep(0.25)
 
     def __del__(self):
         self.car.reset()
@@ -144,5 +144,6 @@ class AirSimCarEnv(AirSimEnv):
 
     def reset(self):
         self._setup_car()
+        self._do_action(0)
         self._do_action(1)
         return self._get_obs()
