@@ -128,7 +128,7 @@ class AirSimCarEnv(AirSimEnv):
         if reward < -1:
             done = 1
         if self.car_controls.brake == 0:
-            if self.car_state.speed <= .5 and self.car_state.rpm <= 2000:
+            if self.car_state.speed <= 1:
                 done = 1
         if self.state["collision"]:
             done = 1
