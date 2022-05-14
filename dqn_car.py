@@ -3,6 +3,7 @@ import gym
 import airgym
 import time
 import subprocess
+import set_ir_data as ir
 
 from stable_baselines3 import DQN
 from stable_baselines3.common.monitor import Monitor
@@ -67,6 +68,9 @@ callbacks.append(eval_callback)
 
 kwargs = {}
 kwargs["callback"] = callbacks
+
+# Set IR data
+ir.set_sensor();
 
 # Create Tensorboard log
 tb_log="dqn_airsim_car_run_" + str(time.time())
