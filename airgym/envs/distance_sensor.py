@@ -13,7 +13,7 @@ class DistanceInterface():
     def __init__(self, car_client):
 
         self._car_client = car_client
-        self._distance_threshold = 20.0
+        self._distance_threshold = 0.5
         self.current_sensor_reading = 40.0
 
         self.state = {
