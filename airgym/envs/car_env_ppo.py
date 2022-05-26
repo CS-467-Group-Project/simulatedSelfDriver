@@ -10,7 +10,6 @@ import gym
 from gym import spaces
 from airgym.envs.airsim_env import AirSimEnv
 
-
 class AirSimCarEnv(AirSimEnv):
     def __init__(self, ip_address, image_shape):
         super().__init__(image_shape)
@@ -101,7 +100,7 @@ class AirSimCarEnv(AirSimEnv):
         return image
 
     def _compute_reward(self):
-        MAX_SPEED = 300
+        MAX_SPEED = 200
         MIN_SPEED = 10
         THRESH_DIST = 3.5
         BETA = 3
@@ -124,20 +123,22 @@ class AirSimCarEnv(AirSimEnv):
             norm = np.linalg.norm(pts[i] - pts[i + 1])
             cross_norm = np.linalg.norm(cross / norm)
 
-            #print('Prev: %3.2f | New: %3.2f from [%4d, %4d], [%4d, %4d]' %
+            #print('Prev: %3.2f | New: %3.2f from [%4d, %4d], [%4d, %4d]' % 
             #      (dist, cross_norm, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1])
             #)
 
             dist = min(dist, cross_norm)
 
-        print('Distance: %f' % dist)
-        if dist > THRESH_DIST:
+        #print('Distance: %f' % dist)
+        if dist > THRESH_DIST or self.car_state.speed >= 40:
             reward = -3
         else:
             reward_dist = math.exp(-BETA * dist) - 0.5
             reward_speed = (
                 (self.car_state.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)
             ) - 0.5
+
+            #print('Car Speed: %3.1f| Reward: %3.3f' % (self.car_state.speed, reward_speed))
             reward = reward_dist + reward_speed
 
         done = 0
