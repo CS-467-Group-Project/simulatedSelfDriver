@@ -3,14 +3,11 @@ import airsim
 import numpy as np
 import math
 import time
-# For troubleshooting
-import os 
-import cv2
-from typing import Dict, Union
 
 import gym
 from gym import spaces
 from airgym.envs.airsim_env import AirSimEnv
+from airgym.envs.distance_sensor import DistanceInterface as DistInt
 
 
 class AirSimCarEnv(AirSimEnv):
@@ -26,6 +23,8 @@ class AirSimCarEnv(AirSimEnv):
             "pose": None,
             "prev_pose": None,
             "collision": False,
+            "distance_envelope": 40.0,
+            "dist_thresh_breached": False
         }
 
         self.car = airsim.CarClient(ip=ip_address)
@@ -51,7 +50,7 @@ class AirSimCarEnv(AirSimEnv):
         self.car.reset()
         self.car.enableApiControl(True)
         self.car.armDisarm(True)
-        time.sleep(0.25)
+        time.sleep(0.2)
 
     def __del__(self):
         #print("SELF.CAR=",self.car)
@@ -76,7 +75,7 @@ class AirSimCarEnv(AirSimEnv):
             self.car_controls.steering = -0.25
 
         self.car.setCarControls(self.car_controls)
-        time.sleep(.5)
+        time.sleep(1)
 
     def transform_obs(self, response):
         im_final = []
@@ -120,6 +119,18 @@ class AirSimCarEnv(AirSimEnv):
         self.state["pose"] = self.car_state.kinematics_estimated
         self.state["collision"] = self.car.simGetCollisionInfo().has_collided
 
+        data_car1 = self.car.getDistanceSensorData(vehicle_name="Car1")
+        distanceSensorKit = DistInt(self.car)
+        pastThreshold = DistInt.has_breached_threshold(distanceSensorKit)
+
+        if pastThreshold:
+            self.state["collision"] = True
+            self.car.simGetCollisionInfo().has_collided = True
+            print("Safety threshold breached")
+            self.state["distance_envelope"] = data_car1.distance,
+            self.state["dist_thresh_breached"] = True
+            print(f"Car1 data: {data_car1.distance}")
+
         return image
 
     def _compute_reward(self):
@@ -149,7 +160,6 @@ class AirSimCarEnv(AirSimEnv):
                 / np.linalg.norm(pts[i] - pts[i + 1]),
             )
 
-        #print(dist)
         if dist > THRESH_DIST:
             reward = -3
         else:
@@ -167,6 +177,12 @@ class AirSimCarEnv(AirSimEnv):
                 done = 1
         if self.state["collision"]:
             done = 1
+            print("collision reward")
+        if self.state["dist_thresh_breached"]:
+            done = 1
+            # reward = reward - 10
+            self.state["dist_thresh_breached"] = False
+            print("breach reward")
 
         return reward, done
 
